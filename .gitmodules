@@ -1,0 +1,6 @@
+[submodule "infer_helpers/Grounded-SAM-2"]
+	path = infer_helpers/Grounded-SAM-2
+	url = https://github.com/IDEA-Research/Grounded-SAM-2.git
+[submodule "infer_helpers/Depth-Anything-V2"]
+	path = infer_helpers/Depth-Anything-V2
+	url = https://github.com/DepthAnything/Depth-Anything-V2.git

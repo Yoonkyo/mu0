@@ -1,0 +1,4 @@
+# Inference-only model weights — large files, downloaded out-of-band.
+# See README.md "Install Inference environment" for the wget commands.
+*
+!.gitignore
