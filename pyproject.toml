@@ -262,6 +262,7 @@ all = [
 # are not part of the trace-prediction training/evaluation surface.
 lerobot-eval="lerobot.scripts.lerobot_eval:main"
 lerobot-train="lerobot.scripts.lerobot_train:main"
+lerobot-train-policy-mu0="lerobot.scripts.lerobot_train_policy_mu0:main"
 lerobot-train-trace-mu0="lerobot.scripts.lerobot_train_trace_mu0:main"
 lerobot-train-tokenizer="lerobot.scripts.lerobot_train_tokenizer:main"
 lerobot-dataset-viz="lerobot.scripts.lerobot_dataset_viz:main"

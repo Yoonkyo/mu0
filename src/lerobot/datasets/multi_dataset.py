@@ -42,6 +42,7 @@ class MultiLeRobotDataset(torch.utils.data.Dataset):
         self,
         repo_ids: list[str],
         root: str | Path | None = None,
+        roots: list[str | Path] | None = None,
         episodes: dict | None = None,
         image_transforms: Callable | None = None,
         delta_timestamps: dict[str, list[float]] | None = None,
@@ -53,12 +54,20 @@ class MultiLeRobotDataset(torch.utils.data.Dataset):
         self.repo_ids = repo_ids
         self.root = Path(root) if root else HF_LEROBOT_HOME
         self.tolerances_s = tolerances_s if tolerances_s else dict.fromkeys(repo_ids, 0.0001)
+        if roots is not None:
+            if len(roots) != len(repo_ids):
+                raise ValueError(
+                    f"`roots` length ({len(roots)}) must match `repo_ids` length ({len(repo_ids)})."
+                )
+            per_dataset_roots = [Path(r) for r in roots]
+        else:
+            per_dataset_roots = [self.root / repo_id for repo_id in repo_ids]
         # Construct the underlying datasets passing everything but `transform` and `delta_timestamps` which
         # are handled by this class.
         self._datasets = [
             LeRobotDataset(
                 repo_id,
-                root=self.root / repo_id,
+                root=per_dataset_roots[i],
                 episodes=episodes[repo_id] if episodes else None,
                 image_transforms=image_transforms,
                 delta_timestamps=delta_timestamps,
@@ -66,7 +75,7 @@ class MultiLeRobotDataset(torch.utils.data.Dataset):
                 download_videos=download_videos,
                 video_backend=video_backend,
             )
-            for repo_id in repo_ids
+            for i, repo_id in enumerate(repo_ids)
         ]
 
         # Disable any data keys that are not common across all of the datasets. Note: we may relax this

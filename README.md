@@ -69,16 +69,23 @@ git clone --recursive <this-repo-url>
 ## Release artifacts
 
 Weights, evaluation data, and normalization stats are not shipped in this repo.
-Download and extract the release bundle:
+They are hosted on the Hugging Face Hub
+([`furonghuang-lab/mu0`](https://huggingface.co/furonghuang-lab/mu0)). Download the whole
+release in one command:
 
 ```bash
-wget https://obj.umiacs.umd.edu/mu0-release/mu0_rollout.tar
-tar -xf mu0_rollout.tar
+pip install -U "huggingface_hub[hf_transfer]"
+hf download furonghuang-lab/mu0 --local-dir mu0_release
+cd mu0_release && tar -xf test_set.tar    # only needed for evaluation
 ```
 
-This unpacks `final_ckpt/` (released checkpoint), `test_set/` (evaluation
-episodes), and `normalizer_stats.json` (delta/depth normalization stats used in
-training and evaluation). See
+This gives `final_ckpt/` (released checkpoint), `normalizer_stats.json`
+(delta/depth normalization stats used in training and evaluation), and
+`test_set.tar` (evaluation episodes; extracts to `test_set/`). You can also grab
+individual files via their `resolve` URLs, e.g.
+`https://huggingface.co/furonghuang-lab/mu0/resolve/main/final_ckpt/model.safetensors`.
+
+See
 [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md) for usage. For
 training on your own TraceExtract episodes, see
 [`docs/release/TRAINING.md`](docs/release/TRAINING.md) §2.

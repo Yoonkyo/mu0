@@ -453,7 +453,7 @@ def convert_info(root, new_root, data_file_size_in_mb, video_file_size_in_mb):
 
 
 def convert_dataset(
-    repo_id: str,
+    repo_id: str | None = None,
     branch: str | None = None,
     data_file_size_in_mb: int | None = None,
     video_file_size_in_mb: int | None = None,
@@ -461,6 +461,17 @@ def convert_dataset(
     push_to_hub: bool = True,
     force_conversion: bool = False,
 ):
+    if repo_id is None:
+        if root is None:
+            raise ValueError(
+                "repo_id is required when root is not provided "
+                "(used to derive the default local root)."
+            )
+        if push_to_hub:
+            raise ValueError(
+                "repo_id is required when push_to_hub=True "
+                "(used for Hub tag/delete/upload operations)."
+            )
     if data_file_size_in_mb is None:
         data_file_size_in_mb = DEFAULT_DATA_FILE_SIZE_IN_MB
     if video_file_size_in_mb is None:
@@ -535,9 +546,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--repo-id",
         type=str,
-        required=True,
-        help="Repository identifier on Hugging Face: a community or a user name `/` the name of the dataset "
-        "(e.g. `lerobot/pusht`, `<USER>/aloha_sim_insertion_human`).",
+        required=False,
+        default=None,
+        help="Repository identifier on Hugging Face (e.g. `lerobot/pusht`). "
+        "Required when --root is omitted or --push-to-hub=true; "
+        "otherwise can be omitted.",
     )
     parser.add_argument(
         "--branch",

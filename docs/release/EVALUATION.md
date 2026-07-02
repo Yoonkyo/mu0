@@ -79,11 +79,11 @@ Test episodes use the same TraceExtract directory format as training (§2 of
 Download the release bundle (see also the README **Release artifacts** section):
 
 ```bash
-wget https://obj.umiacs.umd.edu/mu0-release/mu0_rollout.tar
-tar -xf mu0_rollout.tar
+hf download furonghuang-lab/mu0 --local-dir mu0_release
+cd mu0_release && tar -xf test_set.tar
 ```
 
-This unpacks `final_ckpt/`, `test_set/`, and `normalizer_stats.json` — pass
+This gives `final_ckpt/`, `test_set/`, and `normalizer_stats.json` — pass
 them to `--checkpoint`, `--test_dirs`, and `--delta_stats_path` respectively.
 
 ---

@@ -64,41 +64,28 @@ python src/lerobot/scripts/convert_dataset_v21_to_v30.py \
 
 ## 4. Train
 
-The frozen μ₀ trace checkpoint (`final_ckpt/`) and normalization stats
-(`normalizer_stats.json`) ship in the release bundle from the [main
-README](../../README.md#release-artifacts) (`mu0_rollout.tar`). The command
-below assumes they have been extracted into the repo root.
-
-Three parallel lists select the demonstration data prepared in
-[§3](#3-demonstration-data) — `--dataset_repo_ids`, `--dataset_roots`, and
-`--task_names` must all have the **same length**. `--dataset_roots` points at
-the migrated v3.0 dataset folders on disk; `--dataset_repo_ids` is the
-string identifier used as a per-dataset label (no network access when roots
-are local); `--task_names` lists the RoboCasa task IDs to include.
-
-Training launches via `accelerate` across 4 GPUs.
+Two training presets are wrapped as bash scripts. Both read the release-bundle
+paths (`final_ckpt/`, `normalizer_stats.json`) by default and launch on 4 GPUs
+via `accelerate`. The task list and hyper-parameters (steps, save/warmup
+frequencies, dataset roots) are baked into each script; edit the arrays inside
+to swap tasks.
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 accelerate launch \
-  --num_processes=4 --multi_gpu --mixed_precision=no \
-  src/lerobot/scripts/lerobot_train_policy_mu0.py \
-  --trace_checkpoint=final_ckpt \
-  --delta_stats_path=normalizer_stats.json \
-  --dataset_repo_ids='[<TBD>]' \
-  --dataset_roots='[<TBD>]' \
-  --task_names='[<TBD>]' \
-  --output_dir=outputs/robocasa/mu0_policy \
-  --camera_name=observation.images.robot0_agentview_left \
-  --gripper_camera_name=observation.images.robot0_eye_in_hand \
-  --action_dim=12 --chunk_size=16 --state_dim=16 \
-  --gripper_spatial_pool_size=8 --use_trace=true \
-  --training_steps=60000 --batch_size=4 --lr=1e-4 --weight_decay=0.01 \
-  --grad_clip_norm=1.0 --warmup_steps=1000 \
-  --log_freq=10 --save_freq=5000 --val_l1_freq=1500 \
-  --num_workers=8 \
-  --wandb_enable=false --wandb_project=robocasa \
-  --seed=42 \
-  --job_name=mu0_policy_main
+# 8-task subset for 60k steps
+bash src/lerobot/scripts/train_policy_mu0_atomic8.sh
+
+# All 65 atomic tasks for 150k steps
+bash src/lerobot/scripts/train_policy_mu0_atomic65.sh
+```
+
+Override paths via env vars if the release bundle lives elsewhere or you have
+a different GPU layout:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+TRACE_CKPT=path/to/final_ckpt \
+DELTA_STATS=path/to/normalizer_stats.json \
+  bash src/lerobot/scripts/train_policy_mu0_atomic8.sh
 ```
 
 ---
@@ -116,22 +103,49 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 accelerate launch \
 
 ## 6. Evaluation
 
-`lerobot_eval_policy_mu0.py` loads the same frozen μ₀ trace checkpoint plus
-the trained action expert checkpoint produced in §4, runs N rollouts in the
-RoboCasa env, and writes `eval_<task>.json` (plus optional MP4 rollouts).
+`eval_policy_mu0_atomic8.sh` rolls out the atomic-8 policy on each of the 8
+tasks (50 rollouts × 8) and writes MP4s + `eval_<task>.json` per task under
+the checkpoint's parent directory.
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python src/lerobot/scripts/lerobot_eval_policy_mu0.py \
-  --trace_checkpoint=final_ckpt \
-  --delta_stats_path=normalizer_stats.json \
-  --policy_checkpoint=outputs/robocasa/mu0_policy/final \
-  --task_name=PickPlaceCounterToCabinet \
-  --num_rollouts=50 \
-  --num_videos_to_save=5 \
-  --n_action_steps=8
+bash src/lerobot/scripts/eval_policy_mu0_atomic8.sh
 ```
 
-`--policy_checkpoint` accepts either a `checkpoint.pt` file or the directory
-containing it — the training output's `final/` (or any `step_*/`) directory
-can be passed directly. Results land in `<output_dir>/eval_<task>.json`,
-defaulting to the policy checkpoint's parent directory.
+The default `--policy_checkpoint` is
+`outputs/robocasa/mu0_policy/atomic8_60k_s42/final`, which matches the local
+training output from §4. Override via env vars to point at a different
+checkpoint or release bundle:
+
+```bash
+POLICY_CKPT=path/to/final \
+TRACE_CKPT=path/to/final_ckpt \
+DELTA_STATS=path/to/normalizer_stats.json \
+  bash src/lerobot/scripts/eval_policy_mu0_atomic8.sh
+```
+
+### Pre-trained policy
+
+To skip §4 and evaluate directly, download the pre-trained release and extract
+into `outputs/robocasa/` so the tree matches the training output layout:
+
+```bash
+wget https://huggingface.co/furonghuang-lab/mu0-policy/resolve/main/mu0_policy.tar
+tar -xf mu0_policy.tar -C outputs/robocasa/
+```
+
+Resulting tree:
+
+```
+outputs/robocasa/mu0_policy/
+├── atomic8_60k_s42/final/checkpoint.pt
+└── atomic65_all_150k_s42/final/checkpoint.pt
+```
+
+With that in place, `eval_policy_mu0_atomic8.sh` works out of the box
+(defaults to the atomic-8 checkpoint). To evaluate the atomic-65 checkpoint on
+the same 8 tasks, override `POLICY_CKPT`:
+
+```bash
+POLICY_CKPT=outputs/robocasa/mu0_policy/atomic65_all_150k_s42/final \
+  bash src/lerobot/scripts/eval_policy_mu0_atomic8.sh
+```

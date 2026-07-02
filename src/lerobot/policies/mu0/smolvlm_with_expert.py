@@ -536,6 +536,7 @@ class SmolVLMWithExpertModel(nn.Module):
         use_cache: bool | None = None,
         fill_kv_cache: bool | None = None,
         expert_adaln_modulation: torch.Tensor | None = None,
+        return_pre_final_norm: bool = False,
     ):
         """Forward through the joint VLM + action-expert stack.
 
@@ -664,6 +665,8 @@ class SmolVLMWithExpertModel(nn.Module):
 
             inputs_embeds = outputs_embeds
 
+        pre_final_norm_embeds = inputs_embeds
+
         # final norm
         outputs_embeds = []
         for i, hidden_states in enumerate(inputs_embeds):
@@ -672,6 +675,8 @@ class SmolVLMWithExpertModel(nn.Module):
                 outputs_embeds.append(out_emb)
             else:
                 outputs_embeds.append(None)
+        if return_pre_final_norm:
+            return outputs_embeds, past_key_values, pre_final_norm_embeds
         return outputs_embeds, past_key_values
 
     def get_attention_interface(self):
