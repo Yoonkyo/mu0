@@ -2,7 +2,8 @@
 
 <p align="center">
   🌐 <a href="https://mu0-wm.github.io">Project Page</a> ·
-  📄 <a href="https://arxiv.org/abs/2606.13769">Paper (arXiv:2606.13769)</a>
+  📄 <a href="https://arxiv.org/abs/2606.13769">Paper</a> ·
+  🤗 <a href="https://huggingface.co/collections/furonghuang-lab/mu0">Models</a>
 </p>
 
 <p align="center">
@@ -37,7 +38,7 @@ video alone** and transferred across robot embodiments.
 </p>
 
 This repository contains the training and evaluation code for μ₀. It is built on
-top of [🤗 LeRobot](https://github.com/huggingface/lerobot) — we use its SmolVLA
+top of 🤗[LeRobot](https://github.com/huggingface/lerobot) — we use its SmolVLA
 backbone and dataset/training infrastructure (see
 [Acknowledgements](#acknowledgements)).
 
@@ -62,8 +63,12 @@ on-the-fly (Depth-Anything-V2 + Grounded-SAM-2).
   RoboCasa simulation-based mu0 robot policy training and evaluation.
 
 ```bash
-# Clone with submodules (needed only for the full GSAM + Depth-Anything eval / GUI)
-git clone --recursive <this-repo-url>
+# Clone this repo, then pull only the submodules you need:
+git clone https://github.com/Yoonkyo/mu0 && cd mu0
+#   full eval + interactive GUI (Depth-Anything-V2 + Grounded-SAM-2 synthesis):
+git submodule update --init infer_helpers/Grounded-SAM-2 infer_helpers/Depth-Anything-V2
+#   RoboCasa policy training / evaluation:
+git submodule update --init third_party/robosuite third_party/robocasa
 ```
 
 ## Release artifacts
