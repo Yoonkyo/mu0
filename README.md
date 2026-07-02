@@ -58,6 +58,8 @@ on-the-fly (Depth-Anything-V2 + Grounded-SAM-2).
   environment setup, the golden single-GPU recipe, and the multi-GPU launch.
 - **Evaluation** → [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md):
   batch image-only trace prediction (with metrics) and the interactive GUI.
+- **Policy Training & Evaluation** → [`docs/release/TRAINING_POLICY.md`](docs/release/TRAINING_POLICY.md):
+  RoboCasa simulation-based mu0 robot policy training and evaluation.
 
 ```bash
 # Clone with submodules (needed only for the full GSAM + Depth-Anything eval / GUI)
@@ -80,10 +82,9 @@ training and evaluation). See
 [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md) for usage. For
 training on your own TraceExtract episodes, see
 [`docs/release/TRAINING.md`](docs/release/TRAINING.md) §2.
+For training and evaluating downstream control policies on μ₀'s predicted 3D traces, see
+[`docs/release/TRAINING_POLICY.md`](docs/release/TRAINING_POLICY.md).
 
-> **🚧 Coming soon — μ₀ as policy.** We will release the code for *using μ₀ as a
-> policy* — training downstream control policies on μ₀'s predicted 3D traces —
-> together with the **RoboCasa-365** checkpoint. Stay tuned!
 
 
 ## Citation
