@@ -1,3 +1,5 @@
+
+
 <h1 align="center">μ₀: A Scalable 3D Interaction-Trace World Model</h1>
 
 <p align="center">
@@ -65,6 +67,7 @@ on-the-fly (Depth-Anything-V2 + Grounded-SAM-2).
 ```bash
 # Clone this repo, then pull only the submodules you need:
 git clone https://github.com/Yoonkyo/mu0 && cd mu0
+pip install -e .  # Install the package in editable mode
 #   full eval + interactive GUI (Depth-Anything-V2 + Grounded-SAM-2 synthesis):
 git submodule update --init infer_helpers/Grounded-SAM-2 infer_helpers/Depth-Anything-V2
 #   RoboCasa policy training / evaluation:
