@@ -1,5 +1,7 @@
 <h1 align="center">μ₀: A Scalable 3D Interaction-Trace World Model</h1>
 
+<h3 align="center">CoRL 2026</h3>
+
 <p align="center">
   🌐 <a href="https://mu0-wm.github.io">Project Page</a> ·
   📄 <a href="https://arxiv.org/abs/2606.13769">Paper</a> ·
