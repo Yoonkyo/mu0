@@ -10,13 +10,11 @@ model predicts the future trace of those keypoints with a flow-matching head.
 > **TL;DR:** create the conda env → (optionally) precompute normalization stats →
 > run the single-GPU training command in §4 on one or two episodes.
 
-## 🚧 Coming Soon: We will release TraceExtract soon! 🚧
-
-The instructions below train on **TraceExtract episodes** — the 3D keypoint-trace
-data produced by our extraction pipeline. TraceExtract and its episodes are
-currently being prepared for public release. In the meantime, you can set up the
-environment (§1) and train on our [sample training set](#sample-training-set)
-(§2), or on your own episodes in the same format. Stay tuned!
+> **Training data.** The instructions below train on **TraceExtract episodes** —
+> the 3D keypoint-trace data produced by our extraction pipeline,
+> [**TraceExtract**](https://github.com/Yoonkyo/TraceExtract). Use it to convert
+> your own videos and robot datasets into episodes, or start right away with our
+> [sample training set](#sample-training-set) (§2).
 
 ---
 
@@ -73,7 +71,7 @@ TraceExtract episodes also ship extra arrays (`raw_traj*.npy`, `raw_valid_steps*
 are safe to keep or drop.
 
 Pass one or more episode dirs (or globs) via `--video_dirs` pointing at your
-TraceExtract output.
+[TraceExtract](https://github.com/Yoonkyo/TraceExtract) output.
 
 ### Sample training set
 
@@ -96,8 +94,7 @@ Then use the episodes as the `--video_dirs` of §3 / §4, e.g. in §4:
 
 `normalizer_stats.json` holds the normalization stats the released checkpoint was
 trained with; alternatively, omit `--delta_stats_path` to compute stats from the
-sample episodes (§3). The episodes are derived from DROID — if you use them,
-please follow DROID's license and cite DROID (see `sample_train_set/README.md`).
+sample episodes (§3).
 
 ---
 
