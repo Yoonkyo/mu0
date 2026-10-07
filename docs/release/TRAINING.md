@@ -15,8 +15,8 @@ model predicts the future trace of those keypoints with a flow-matching head.
 The instructions below train on **TraceExtract episodes** — the 3D keypoint-trace
 data produced by our extraction pipeline. TraceExtract and its episodes are
 currently being prepared for public release. In the meantime, you can set up the
-environment (§1) and follow the data layout in §2 to train on your own episodes
-in the same format. Stay tuned!
+environment (§1) and train on our [sample training set](#sample-training-set)
+(§2), or on your own episodes in the same format. Stay tuned!
 
 ---
 
@@ -74,6 +74,30 @@ are safe to keep or drop.
 
 Pass one or more episode dirs (or globs) via `--video_dirs` pointing at your
 TraceExtract output.
+
+### Sample training set
+
+To try training without running TraceExtract yourself, download our sample
+training set: 20 [DROID](https://droid-dataset.github.io) episodes already
+processed by TraceExtract, with language annotations (~750 MB; not part of the
+evaluation set).
+
+```bash
+hf download furonghuang-lab/mu0 sample_train_set.tar normalizer_stats.json --local-dir mu0_release
+cd mu0_release && tar -xf sample_train_set.tar    # extracts to sample_train_set/droid/<episode>/
+```
+
+Then use the episodes as the `--video_dirs` of §3 / §4, e.g. in §4:
+
+```bash
+  --video_dirs='[/path/to/mu0_release/sample_train_set/droid/*]' \
+  --delta_stats_path=/path/to/mu0_release/normalizer_stats.json \
+```
+
+`normalizer_stats.json` holds the normalization stats the released checkpoint was
+trained with; alternatively, omit `--delta_stats_path` to compute stats from the
+sample episodes (§3). The episodes are derived from DROID — if you use them,
+please follow DROID's license and cite DROID (see `sample_train_set/README.md`).
 
 ---
 
