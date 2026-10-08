@@ -28,6 +28,12 @@
 
 ---
 
+### 📢 News
+
+- **[2026.10.07]** 🎉 **TraceExtract**, the data engine of μ₀, is now released! → [github.com/Yoonkyo/TraceExtract](https://github.com/Yoonkyo/TraceExtract)
+
+---
+
 **μ₀** is a **trace world model** that operates in **3D space** rather than pixel
 or action space. Given an image, a language instruction, and a short history of
 keypoints, μ₀ predicts the future **3D traces of semantic interaction points** —
