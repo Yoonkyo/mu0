@@ -110,12 +110,12 @@ For training and evaluating downstream control policies on μ₀'s predicted 3D 
 ## Citation
 
 ```bibtex
-@article{lee2026mu0,
+@inproceedings{lee2026mu0,
   title={$\mu_0$: A Scalable 3D Interaction-Trace World Model},
   author={Lee, Seungjae and Jung, Yoonkyo and Lee, Jusuk and Shin, Jonghun and
           Shahidzadeh, Amir Hossein and Lee, Yao-Chih and Kim, H. Jin and
           Huang, Jia-Bin and Huang, Furong},
-  journal={arXiv preprint arXiv:2606.13769},
+  booktitle={Conference on Robot Learning (CoRL)},
   year={2026}
 }
 ```
