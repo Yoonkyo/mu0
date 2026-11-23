@@ -107,6 +107,39 @@ For training and evaluating downstream control policies on μ₀'s predicted 3D 
 
 
 
+### Run on Intel GPU (XPU)
+
+The batch evaluation in [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md)
+(headline command: dataset keypoints, no depth, no history) also runs on Intel
+GPUs (Arc discrete and Core Ultra integrated graphics) with the PyTorch XPU
+build. `pyproject.toml` pins `torch>=2.7,<2.11`, and `pip install -e .` would
+replace the XPU build with a CUDA wheel from PyPI, so install the project
+without dependencies and add the rest from `requirements-xpu.txt`:
+
+```bash
+python3 -m venv .venv-xpu && source .venv-xpu/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
+pip install -e . --no-deps
+pip install -r requirements-xpu.txt   # pip warns that lerobot wants torch<2.11: expected
+
+python src/lerobot/scripts/lerobot_predict_trace_mu0_image_only.py \
+  --device=xpu \
+  --checkpoint=mu0_release/final_ckpt \
+  --test_dirs='[mu0_release/test_set/*/*]' \
+  --delta_stats_path=mu0_release/normalizer_stats.json \
+  --first_frame_only=true --first_frame_offset=[4,8,12] \
+  --n_min=16 --n_max=16 \
+  --use_kp_from_dataset=true --use_depth_from=none --no_provide_history=true \
+  --num_samples_for_metrics=5 \
+  --output_dir=outputs/eval_xpu --seed=0
+```
+
+Without `--device`, the script picks the first available of CUDA, MPS, XPU and
+CPU, and the default `--dtype=bfloat16` uses autocast on both CUDA and XPU.
+Depth and keypoint synthesis (Depth-Anything-V2, Grounded-SAM-2, whose
+GroundingDINO op is built for CUDA), the interactive GUI, training and the
+RoboCasa policy scripts are unchanged and were not tested on XPU.
+
 ## Citation
 
 ```bibtex

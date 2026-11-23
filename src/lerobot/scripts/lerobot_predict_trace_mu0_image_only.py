@@ -96,6 +96,7 @@ from lerobot.datasets.trace_depth import render_depth_rgb
 from lerobot.policies.mu0.visualize_trace import render_trace_motion_still
 from lerobot.policies.mu0.modeling_smolvla import SmolVLAPolicy
 from lerobot.utils.constants import OBS_LANGUAGE_ATTENTION_MASK, OBS_LANGUAGE_TOKENS
+from lerobot.utils.device_utils import auto_select_torch_device
 from lerobot.utils.utils import init_logging
 
 
@@ -122,7 +123,8 @@ class TracePredictImageOnlyConfig:
     batch_size: int = 8
     num_workers: int = 0  # DA-V2 / GSAM live on the inference GPU; keep single-process.
     num_inference_steps: int | None = None
-    device: str = "cuda"
+    # None picks the first available backend (cuda, mps, xpu, then cpu).
+    device: str | None = None
     dtype: str = "bfloat16"
 
     # Sampling overrides (None → use ckpt config). n_min/n_max are consumed
@@ -753,9 +755,11 @@ def predict(cfg: TracePredictImageOnlyConfig) -> None:
     """
     init_logging()
 
+    if cfg.device is None:
+        cfg.device = auto_select_torch_device().type
     device = torch.device(cfg.device)
     dtype = {"float32": torch.float32, "bfloat16": torch.bfloat16, "float16": torch.float16}[cfg.dtype]
-    use_autocast = dtype != torch.float32 and device.type == "cuda"
+    use_autocast = dtype != torch.float32 and device.type in ("cuda", "xpu")
 
     logging.info(f"Loading policy from {cfg.checkpoint}")
     logging.info(
