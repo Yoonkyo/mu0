@@ -19,6 +19,7 @@ from typing import Literal
 import cv2
 import numpy as np
 import torch
+import torch.nn.functional as F  # noqa: N812
 
 
 _DA_V2_REPO_RELPATH = "infer_helpers/Depth-Anything-V2/metric_depth"
@@ -95,8 +96,12 @@ class DepthAnythingV2Wrapper:
         # DA-V2's `infer_image` expects BGR uint8 (it does cv2.cvtColor BGR2RGB
         # internally), so flip channels here to keep our public API RGB.
         bgr = cv2.cvtColor(image_rgb_uint8, cv2.COLOR_RGB2BGR)
-        depth = self.model.infer_image(bgr, self.input_size)
-        return np.asarray(depth, dtype=np.float32)
+        # Same steps as DA-V2's `infer_image`, which moves the input to
+        # cuda/mps/cpu only; here it goes to the model's own device (e.g. xpu).
+        image, (h, w) = self.model.image2tensor(bgr, self.input_size)
+        depth = self.model(image.to(self.device))
+        depth = F.interpolate(depth[:, None], (h, w), mode="bilinear", align_corners=True)[0, 0]
+        return np.asarray(depth.cpu().numpy(), dtype=np.float32)
 
     def infer_aligned(
         self,

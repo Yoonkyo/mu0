@@ -1,0 +1,27 @@
+# Dependencies for mu0 inference on Intel GPUs (XPU).
+# The pyproject.toml core list plus the dataset and smolvla extras, without
+# torch, torchvision and torchcodec. Install the XPU build of torch first, then
+# `pip install -e . --no-deps` and this file (see README, "Run on Intel GPU (XPU)").
+numpy>=2.0.0,<2.3.0
+opencv-python-headless>=4.9.0,<4.14.0
+Pillow>=10.0.0,<13.0.0
+einops>=0.8.0,<0.9.0
+draccus==0.10.0
+huggingface-hub>=1.0.0,<2.0.0
+requests>=2.32.0,<3.0.0
+gymnasium>=1.1.1,<2.0.0
+safetensors>=0.4.3,<1.0.0
+packaging>=24.2,<26.0
+termcolor>=2.4.0,<4.0.0
+tqdm>=4.66.0,<5.0.0
+cmake>=3.29.0.1,<4.2.0
+setuptools>=71.0.0,<81.0.0
+datasets>=4.0.0,<5.0.0
+pandas>=2.0.0,<3.0.0
+pyarrow>=21.0.0,<30.0.0
+av>=15.0.0,<16.0.0
+jsonlines>=4.0.0,<5.0.0
+transformers==5.3.0
+peft>=0.18.0,<1.0.0
+num2words>=0.5.14,<0.6.0
+accelerate>=1.10.0,<2.0.0

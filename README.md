@@ -107,6 +107,59 @@ For training and evaluating downstream control policies on μ₀'s predicted 3D 
 
 
 
+### Run on Intel GPU (XPU)
+
+The evaluation in [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md)
+(batch prediction, with or without Depth-Anything-V2 and Grounded-SAM-2
+synthesis) and the interactive GUI also run on Intel GPUs (Arc discrete and
+Core Ultra integrated graphics) with the PyTorch XPU build. `pyproject.toml`
+pins `torch>=2.7,<2.11`, and `pip install -e .` would replace the XPU build
+with a CUDA wheel from PyPI, so install the project without dependencies and
+add the rest from `requirements-xpu.txt`:
+
+```bash
+python3 -m venv .venv-xpu && source .venv-xpu/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
+pip install -e . --no-deps
+pip install -r requirements-xpu.txt   # pip warns that lerobot wants torch<2.11: expected
+
+python src/lerobot/scripts/lerobot_predict_trace_mu0_image_only.py \
+  --device=xpu \
+  --checkpoint=mu0_release/final_ckpt \
+  --test_dirs='[mu0_release/test_set/*/*]' \
+  --delta_stats_path=mu0_release/normalizer_stats.json \
+  --first_frame_only=true --first_frame_offset=[4,8,12] \
+  --n_min=16 --n_max=16 \
+  --use_kp_from_dataset=true --use_depth_from=none --no_provide_history=true \
+  --num_samples_for_metrics=5 \
+  --output_dir=outputs/eval_xpu --seed=0
+```
+
+For synthesized depth and keypoints (`--use_depth_from=pred`,
+`--use_kp_from_dataset=false`) and the GUI, install the two helpers without
+their CUDA builds (GroundingDINO then runs its PyTorch deformable attention,
+and SAM 2 skips its optional CUDA op), and download the three checkpoints as
+in [`docs/release/EVALUATION.md`](docs/release/EVALUATION.md):
+
+```bash
+git submodule update --init infer_helpers/Grounded-SAM-2 infer_helpers/Depth-Anything-V2
+pip install matplotlib opencv-python "supervision==0.21.0" pycocotools nltk addict yapf timm viser
+cd infer_helpers/Grounded-SAM-2
+SAM2_BUILD_CUDA=0 pip install --no-build-isolation -e .
+pip install --no-build-isolation -e grounding_dino
+cd -
+
+python -m lerobot.scripts.lerobot_trace_gui --device=xpu \
+  --checkpoint=mu0_release/final_ckpt \
+  --delta_stats_path=mu0_release/normalizer_stats.json \
+  --port=8080
+```
+
+Without `--device`, both scripts pick the first available of CUDA, MPS, XPU
+and CPU, and the default `--dtype=bfloat16` uses autocast on CUDA and XPU.
+Training and the RoboCasa policy scripts are unchanged and were not tested
+on XPU.
+
 ## Citation
 
 ```bibtex
